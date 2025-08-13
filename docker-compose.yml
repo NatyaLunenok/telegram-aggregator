@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    build: .
+    container_name: "telegram_postgres"
+    env_file: .env
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tg_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    volumes:
+      - .:/code
+    restart: unless-stopped
+    networks:
+      - tg_network
+
+volumes:
+  pg_data:
+
+networks:
+  tg_network:

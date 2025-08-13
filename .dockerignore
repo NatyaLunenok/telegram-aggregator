@@ -1,0 +1,10 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+tdlib_data/
+venv/
+*.log
+*.tmp
